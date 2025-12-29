@@ -2,31 +2,28 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Clone GitHub Repo') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/subanu03/python-jenkins-docker.git'
+                checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t python-app .'
+                bat 'docker build -t python-app .'
             }
         }
 
         stage('Stop Old Container') {
             steps {
-                sh '''
-                docker stop python-container || true
-                docker rm python-container || true
-                '''
+                bat 'docker stop python-app || exit 0'
+                bat 'docker rm python-app || exit 0'
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                sh 'docker run -d --name python-container -p 5000:5000 python-app'
+                bat 'docker run -d -p 5000:5000 --name python-app python-app'
             }
         }
     }
